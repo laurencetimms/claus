@@ -4,12 +4,12 @@ import ChatPanel from "./components/ChatPanel.jsx";
 import StatePanel from "./components/StatePanel.jsx";
 
 const C = {
-  bg: "#141210", surface: "#1c1917", surface2: "#242018",
-  border: "#2e2a24", border2: "#3a3530",
-  text: "#e8e0d5", muted: "#8a8278", dim: "#5a554f",
-  accent: "#c4873a", accentSoft: "#a06c28", accentDim: "#3d2d14",
-  green: "#5a8a5a", greenDim: "#1e2e1e",
-  red: "#8a4a4a", redDim: "#2e1e1e",
+  bg: "#f4ede0", surface: "#ede4d2", surface2: "#e4d8c2",
+  border: "#c8b89a", border2: "#b8a484",
+  text: "#160e06", muted: "#000000", dim: "#0a0a00",
+  accent: "#b85418", accentSoft: "#d46c28", accentDim: "#f5dcc8",
+  green: "#1e7258", greenDim: "#c8e8dc",
+  red: "#982814", redDim: "#f0ccc4",
 };
 
 export { C };
@@ -22,6 +22,7 @@ export default function App() {
   const [currentState, setCurrentState] = useState(null); // latest extracted state
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
 
   const handleApiKey = (key) => {
     setApiKey(key);
@@ -37,7 +38,17 @@ export default function App() {
     setMessages([]);
     setApiHistory([]);
     setTeamState(null);
+    setCurrentState(null);
     setError("");
+    setShowClearConfirm(false);
+  };
+
+  const handleClearClick = () => {
+    if (currentState !== teamState) {
+      setShowClearConfirm(true);
+    } else {
+      clearSession();
+    }
   };
 
   const sendMessage = useCallback(async (userMessage) => {
@@ -101,6 +112,46 @@ export default function App() {
       background: C.bg, color: C.text,
       fontFamily: "'DM Mono', 'Courier New', monospace",
     }}>
+      {showClearConfirm && (
+        <div style={{
+          position: "fixed", inset: 0, zIndex: 100,
+          background: "rgba(22, 14, 6, 0.35)",
+          display: "flex", alignItems: "center", justifyContent: "center",
+        }}>
+          <div style={{
+            background: C.surface, border: `1px solid ${C.border2}`,
+            borderRadius: "3px", padding: "24px 28px", maxWidth: "360px", width: "100%",
+            boxShadow: "0 8px 32px rgba(0,0,0,0.12)",
+          }}>
+            <p style={{
+              fontFamily: "'DM Mono', monospace", fontSize: "12px",
+              color: C.text, margin: "0 0 20px", lineHeight: "1.75",
+            }}>
+              Team state has changed. Are you sure you want to clear the session?
+            </p>
+            <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
+              <button onClick={() => setShowClearConfirm(false)} style={{
+                fontFamily: "'DM Mono', monospace", fontSize: "10px",
+                letterSpacing: "0.06em", textTransform: "uppercase",
+                padding: "6px 14px", borderRadius: "2px", cursor: "pointer",
+                background: "transparent", border: `1px solid ${C.border2}`,
+                color: C.muted,
+              }}>
+                Cancel
+              </button>
+              <button onClick={clearSession} style={{
+                fontFamily: "'DM Mono', monospace", fontSize: "10px",
+                letterSpacing: "0.06em", textTransform: "uppercase",
+                padding: "6px 14px", borderRadius: "2px", cursor: "pointer",
+                background: C.redDim, border: `1px solid ${C.red}`,
+                color: C.red,
+              }}>
+                Clear session
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Header */}
       <div style={{
         padding: "14px 24px", borderBottom: `1px solid ${C.border}`,
@@ -131,7 +182,7 @@ export default function App() {
           }}>
             {currentState ? "Team loaded" : "No team loaded"}
           </span>
-          <button onClick={clearSession} style={{
+          <button onClick={handleClearClick} style={{
             fontFamily: "'DM Mono', monospace", fontSize: "10px",
             letterSpacing: "0.06em", textTransform: "uppercase",
             padding: "5px 10px", borderRadius: "2px", cursor: "pointer",

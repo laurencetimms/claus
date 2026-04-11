@@ -69,6 +69,12 @@ export default function ChatPanel({ messages, loading, error, onSend, onStateUpl
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading]);
 
+  useEffect(() => {
+    if (!teamStateLoaded) {
+      setUploadLabel("No file loaded");
+    }
+  }, [teamStateLoaded]);
+
   const handleFile = (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -78,6 +84,7 @@ export default function ChatPanel({ messages, loading, error, onSend, onStateUpl
       setUploadLabel(file.name);
     };
     reader.readAsText(file);
+    e.target.value = "";
   };
 
   const handleSend = () => {
