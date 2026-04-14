@@ -154,11 +154,20 @@ export default function OutcomeView({
                   }}>
                     {clausOption.label}
                   </span>
+                  <span style={{
+                    fontSize: "10px", letterSpacing: "0.06em", textTransform: "uppercase",
+                    padding: "2px 8px", borderRadius: "20px",
+                    background: C.green, color: "#fff", fontWeight: "600",
+                    fontFamily: "'DM Mono', monospace",
+                  }}>
+                    ↑ Strong
+                  </span>
                   {matched && (
                     <span style={{
                       fontSize: "10px", letterSpacing: "0.06em", textTransform: "uppercase",
                       padding: "2px 8px", borderRadius: "20px",
-                      background: C.green, color: "#fff", fontWeight: "600",
+                      background: C.surface2, border: `1px solid #2e6b2e`,
+                      color: C.green, fontWeight: "600",
                       fontFamily: "'DM Mono', monospace",
                     }}>
                       ✓ Match
