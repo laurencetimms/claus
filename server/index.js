@@ -4,6 +4,7 @@ import path from "path";
 import fs from "fs";
 import { fileURLToPath } from "url";
 import Anthropic from "@anthropic-ai/sdk";
+import { parseScenario } from "./parseScenario.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -21,6 +22,25 @@ if (fs.existsSync(clientDist)) {
     res.send("Dev server — open <a href='http://localhost:5173'>http://localhost:5173</a> for the frontend.");
   });
 }
+
+// ── Scenarios directory ───────────────────────────────────────────────────────
+
+const scenariosDir = path.join(__dirname, "scenarios");
+
+// ── Scenario endpoint ─────────────────────────────────────────────────────────
+
+app.get("/api/game/scenario/:id", (req, res) => {
+  const scenarioFile = path.join(scenariosDir, `${req.params.id}.md`);
+  if (!fs.existsSync(scenarioFile)) {
+    return res.status(404).json({ error: `Scenario '${req.params.id}' not found` });
+  }
+  try {
+    const scenario = parseScenario(scenarioFile, scenariosDir);
+    res.json(scenario);
+  } catch (err) {
+    res.status(500).json({ error: `Failed to parse scenario: ${err.message}` });
+  }
+});
 
 // ── Skill loaders ─────────────────────────────────────────────────────────────
 
