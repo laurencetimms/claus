@@ -92,6 +92,15 @@ export default function OutcomeView({
             <p style={{ fontSize: "12px", color: C.text, lineHeight: "1.7", margin: 0 }}>
               {playerOption.description}
             </p>
+            {!matched && !loadingClaus && clausResult && playerOption.rationale && (
+              <p style={{
+                fontSize: "11px", color: C.dim, lineHeight: "1.7",
+                margin: "12px 0 0", fontStyle: "italic",
+                borderTop: `1px solid ${playerOutcome.border}`, paddingTop: 10,
+              }}>
+                {playerOption.rationale}
+              </p>
+            )}
           </div>
 
           {/* CLAUS pick */}
@@ -159,6 +168,15 @@ export default function OutcomeView({
                 <p style={{ fontSize: "12px", color: C.text, lineHeight: "1.7", margin: "0 0 12px" }}>
                   {clausOption.description}
                 </p>
+                {!matched && clausOption.rationale && (
+                  <p style={{
+                    fontSize: "11px", color: C.dim, lineHeight: "1.7", margin: "0 0 12px",
+                    borderTop: `1px solid ${C.border}`, paddingTop: 10,
+                    fontStyle: "italic",
+                  }}>
+                    {clausOption.rationale}
+                  </p>
+                )}
                 {clausResult.reasoning && (
                   <p style={{
                     fontSize: "11px", color: C.dim, lineHeight: "1.7", margin: 0,
