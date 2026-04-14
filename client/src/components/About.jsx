@@ -1,4 +1,4 @@
-import { C } from "../App.jsx";
+import { C } from "../theme.js";
 
 export default function About({ onClose }) {
   return (

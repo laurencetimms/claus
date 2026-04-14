@@ -1,4 +1,4 @@
-import { C } from "../App.jsx";
+import { C } from "../theme.js";
 import { EVENTS } from "../constants/events.js";
 
 export function EventSelector({ selected, onChange }) {

@@ -36,12 +36,17 @@ app.get("/api/game/scenario/:id", (req, res) => {
   }
   try {
     const scenario = parseScenario(scenarioFile, scenariosDir);
+    if (!scenario.initialTeamState) {
+      console.error("[scenario] initialTeamState empty — check ---BEGIN TEAM STATE--- block in", scenarioFile);
+    } else {
+      console.log(`[scenario] loaded '${req.params.id}' — team state ${scenario.initialTeamState.length} chars`);
+    }
     res.json(scenario);
   } catch (err) {
+    console.error("[scenario] parse error:", err.message);
     res.status(500).json({ error: `Failed to parse scenario: ${err.message}` });
   }
 });
-
 // ── Skill loaders ─────────────────────────────────────────────────────────────
 
 function loadSkill() {

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { C } from "../App.jsx";
+import { C } from "../theme.js";
 
 export default function ApiKeyInput({ onSubmit }) {
   const [value, setValue] = useState("");

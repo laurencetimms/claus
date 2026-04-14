@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { C } from "../App.jsx";
+import { C } from "../theme.js";
 import { EventSelector, EventInfoBox } from "./EventSelector.jsx";
 
 function ThinkingDots() {

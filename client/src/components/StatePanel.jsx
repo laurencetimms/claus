@@ -1,4 +1,4 @@
-import { C } from "../App.jsx";
+import { C } from "../theme.js";
 
 function renderMarkdown(markdown) {
   return markdown.split("\n").map((line, i) => {

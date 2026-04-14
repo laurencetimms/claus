@@ -17,6 +17,19 @@ export function parseScenario(scenarioPath, scenariosDir) {
   const raw = fs.readFileSync(scenarioPath, "utf-8");
   const lines = raw.split("\n");
 
+  // ── Extract embedded team state ───────────────────────────────────────────────
+  const STATE_START = "---BEGIN TEAM STATE---";
+  const STATE_END   = "---END TEAM STATE---";
+  const stateStartIdx = raw.indexOf(STATE_START);
+  const stateEndIdx   = raw.indexOf(STATE_END);
+  const initialTeamState = stateStartIdx !== -1 && stateEndIdx !== -1
+    ? raw.slice(stateStartIdx + STATE_START.length, stateEndIdx).trim()
+    : "";
+
+  if (!initialTeamState) {
+    console.warn("[parseScenario] No embedded team state found in", scenarioPath);
+  }
+
   // ── Setup section ────────────────────────────────────────────────────────────
   const setupStart = lines.findIndex(l => l.trim() === "## Setup");
   const eventSeqStart = lines.findIndex(l => l.trim() === "## Event Sequence");
@@ -25,7 +38,7 @@ export function parseScenario(scenarioPath, scenariosDir) {
   if (eventSeqStart === -1) throw new Error("No ## Event Sequence section found");
 
   const setupLines = lines.slice(setupStart + 1, eventSeqStart);
-  const setup = parseSetup(setupLines, scenariosDir);
+  const setup = parseSetup(setupLines);
 
   // ── Events ───────────────────────────────────────────────────────────────────
   const eventLines = lines.slice(eventSeqStart + 1);
@@ -38,20 +51,19 @@ export function parseScenario(scenarioPath, scenariosDir) {
     turnCount: events.length,
     playerBriefing: setup.playerBriefing,
     coachingObjective: setup.coachingObjective,
-    initialTeamState: setup.initialTeamState,
+    initialTeamState,
     events,
   };
 }
 
 // ── Setup parser ──────────────────────────────────────────────────────────────
 
-function parseSetup(lines, scenariosDir) {
+function parseSetup(lines) {
   const result = {
     title: "",
     team: "",
     coachingObjective: "",
     playerBriefing: "",
-    initialTeamState: "",
   };
 
   let i = 0;
@@ -66,16 +78,7 @@ function parseSetup(lines, scenariosDir) {
       if (key === "title") result.title = value;
       if (key === "team") result.team = value;
       if (key === "coaching-objective") result.coachingObjective = value;
-      if (key === "initial-team-state") {
-        // Value is "See: `filename.md`" — extract filename and load it
-        const fileMatch = value.match(/`([^`]+)`/);
-        if (fileMatch) {
-          const stateFile = path.join(scenariosDir, fileMatch[1]);
-          if (fs.existsSync(stateFile)) {
-            result.initialTeamState = fs.readFileSync(stateFile, "utf-8").trim();
-          }
-        }
-      }
+      // initial-team-state is now embedded directly in the scenario markdown
       i++;
       continue;
     }
