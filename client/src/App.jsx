@@ -1,25 +1,18 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
+import { Link } from "react-router-dom";
+import { C } from "./theme.js";
 import ApiKeyInput from "./components/ApiKeyInput.jsx";
 import ChatPanel from "./components/ChatPanel.jsx";
 import StatePanel from "./components/StatePanel.jsx";
-
-const C = {
-  bg: "#f4ede0", surface: "#ede4d2", surface2: "#e4d8c2",
-  border: "#c8b89a", border2: "#b8a484",
-  text: "#160e06", muted: "#000000", dim: "#0a0a00",
-  accent: "#b85418", accentSoft: "#d46c28", accentDim: "#f5dcc8",
-  green: "#1e7258", greenDim: "#c8e8dc",
-  red: "#982814", redDim: "#f0ccc4",
-};
 
 export { C };
 
 export default function App() {
   const [apiKey, setApiKey] = useState(() => sessionStorage.getItem("tdc_api_key") || "");
-  const [messages, setMessages] = useState([]);      // display messages
-  const [apiHistory, setApiHistory] = useState([]);  // full Anthropic message history
-  const [teamState, setTeamState] = useState(null);  // uploaded state doc
-  const [currentState, setCurrentState] = useState(null); // latest extracted state
+  const [messages, setMessages] = useState([]);
+  const [apiHistory, setApiHistory] = useState([]);
+  const [teamState, setTeamState] = useState(null);
+  const [currentState, setCurrentState] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showClearConfirm, setShowClearConfirm] = useState(false);
@@ -82,8 +75,6 @@ export default function App() {
 
       setApiHistory(prev => [
         ...prev,
-        // If first message and state was prepended, the server handled it —
-        // we store the plain user message for subsequent turns
         { role: "user", content: userMessage },
         assistantMessage,
       ]);
@@ -152,6 +143,7 @@ export default function App() {
           </div>
         </div>
       )}
+
       {/* Header */}
       <div style={{
         padding: "14px 24px", borderBottom: `1px solid ${C.border}`,
@@ -173,6 +165,15 @@ export default function App() {
           </span>
         </div>
         <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+          <Link to="/game" style={{
+            fontFamily: "'DM Mono', monospace", fontSize: "10px",
+            letterSpacing: "0.06em", textTransform: "uppercase",
+            padding: "5px 10px", borderRadius: "2px",
+            background: C.accentDim, border: `1px solid ${C.accent}`,
+            color: C.accent, textDecoration: "none",
+          }}>
+            Play The Demo ↗
+          </Link>
           <span style={{
             fontSize: "10px", padding: "3px 8px", borderRadius: "2px",
             letterSpacing: "0.06em", textTransform: "uppercase", fontWeight: "500",
@@ -187,7 +188,7 @@ export default function App() {
             letterSpacing: "0.06em", textTransform: "uppercase",
             padding: "5px 10px", borderRadius: "2px", cursor: "pointer",
             background: "transparent", border: `1px solid ${C.border2}`,
-            color: C.dim, transition: "all 0.15s",
+            color: C.dim,
           }}>
             Clear session
           </button>
@@ -196,7 +197,7 @@ export default function App() {
             letterSpacing: "0.06em", textTransform: "uppercase",
             padding: "5px 10px", borderRadius: "2px", cursor: "pointer",
             background: "transparent", border: `1px solid ${C.border2}`,
-            color: C.dim, transition: "all 0.15s",
+            color: C.dim,
           }}>
             Change key
           </button>
@@ -213,9 +214,7 @@ export default function App() {
           onStateUpload={handleStateUpload}
           teamStateLoaded={!!teamState}
         />
-        <StatePanel
-          stateMarkdown={currentState}
-        />
+        <StatePanel stateMarkdown={currentState} />
       </div>
     </div>
   );
