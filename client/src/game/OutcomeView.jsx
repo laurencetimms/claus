@@ -154,14 +154,19 @@ export default function OutcomeView({
                   }}>
                     {clausOption.label}
                   </span>
-                  <span style={{
-                    fontSize: "10px", letterSpacing: "0.06em", textTransform: "uppercase",
-                    padding: "2px 8px", borderRadius: "20px",
-                    background: C.green, color: "#fff", fontWeight: "600",
-                    fontFamily: "'DM Mono', monospace",
-                  }}>
-                    ↑ Strong
-                  </span>
+                  {(() => {
+                    const co = OUTCOME[clausOption.rank];
+                    return (
+                      <span style={{
+                        fontSize: "10px", letterSpacing: "0.06em", textTransform: "uppercase",
+                        padding: "2px 8px", borderRadius: "20px",
+                        background: co.color, color: "#fff", fontWeight: "600",
+                        fontFamily: "'DM Mono', monospace",
+                      }}>
+                        {co.symbol} {co.label}
+                      </span>
+                    );
+                  })()}
                   {matched && (
                     <span style={{
                       fontSize: "10px", letterSpacing: "0.06em", textTransform: "uppercase",

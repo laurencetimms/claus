@@ -37,7 +37,7 @@ export default function GameApp() {
 
   const currentEvent = scenario?.events[turnIndex];
 
-  async function loadOptions(tIdx) {
+  async function loadTurn(tIdx) {
     setError(null);
     setOptions(null);
     setPlayerOption(null);
@@ -45,14 +45,16 @@ export default function GameApp() {
     setPhase("loading-options");
     const event = scenario.events[tIdx];
     try {
-      const res = await fetch("/api/game/options", {
+      const res = await fetch("/api/game/turn", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ apiKey, teamState: scenario.initialTeamState, event }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to load options");
+      if (!res.ok) throw new Error(data.error || "Failed to load turn");
+      // Store options and CLAUS pick together — both come from the same reasoning pass
       setOptions(data.options);
+      setClausResult({ chosenId: data.chosenId, reasoning: data.reasoning });
       setPhase("picking");
     } catch (err) {
       setError(err.message);
@@ -60,27 +62,11 @@ export default function GameApp() {
     }
   }
 
-  function handleStart() { loadOptions(0); }
+  function handleStart() { loadTurn(0); }
 
-  async function handleChoose(option) {
+  function handleChoose(option) {
     setPlayerOption(option);
-    setPhase("loading-claus");
-    setError(null);
-    try {
-      const res = await fetch("/api/game/claus-pick", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ apiKey, teamState: scenario.initialTeamState, event: currentEvent, options }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "CLAUS failed to respond");
-      setClausResult(data);
-      setPhase("outcome");
-    } catch (err) {
-      setError(err.message);
-      setClausResult(null);
-      setPhase("outcome");
-    }
+    setPhase("outcome");
   }
 
   function handleNext() {
@@ -94,7 +80,7 @@ export default function GameApp() {
       setPhase("end");
     } else {
       setTurnIndex(nextIndex);
-      loadOptions(nextIndex);
+      loadTurn(nextIndex);
     }
   }
 
@@ -169,11 +155,11 @@ export default function GameApp() {
             options={options} loading={phase === "loading-options"} error={error} onChoose={handleChoose}
           />
         )}
-        {scenario && (phase === "loading-claus" || phase === "outcome") && playerOption && (
+        {scenario && phase === "outcome" && playerOption && (
           <OutcomeView
             event={currentEvent} playerOption={playerOption} clausResult={clausResult}
             options={options} turnIndex={turnIndex} totalTurns={scenario.events.length}
-            loadingClaus={phase === "loading-claus"} error={error} onNext={handleNext}
+            loadingClaus={false} error={error} onNext={handleNext}
           />
         )}
         {scenario && phase === "end" && (
